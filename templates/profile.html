@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>localhost</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+        <link href="{% static 'styles.css' %}" rel="stylesheet" />
+        <style>
+            .carousel-control-prev, .carousel-control-next{
+                top : -55px;    
+                height: 40px;
+                width: 40px;            
+            }
+            .carousel-control-prev{
+                left : 70%;
+            }
+            .carousel-control-next{
+                left : 80%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="d-flex" id="wrapper">
+            <!-- Sidebar-->
+            <div class="border-end bg-white" id="sidebar-wrapper">
+                <div class="sidebar-heading border-bottom bg-light">My Logo</div>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="{% url 'index' %}">Dashboard</a>
+                </div>
+            </div>
+            <!-- Page content wrapper-->
+            <div id="page-content-wrapper">
+                <!-- Top navigation-->
+                <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                    <div class="container-fluid">
+                        <button class="btn btn-primary" id="sidebarToggle">Toggle Menu</button>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                        
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{request.user}}</a>
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="{% url 'user_logout' %}">Logout</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                <!-- Page content-->
+                <div class="container-fluid">
+                    <div class="row mt-2">
+                        <div class="col-md-12 d-flex justify-content-end">
+                            <button class="btn-sm btn-success m-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Meeting</button>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <img src="{% static 'images/profile.jpg' %}" class="card-img-top" alt="...">
+                                <div class="card-body text-center">
+                                  <h3 class="card-text">{{adhikari.adhikari_name}}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card">
+                                <h5 class="card-header">General Information</h5>
+                                <div class="card-body">
+                                    <table class="table table-bordered border-primary">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:30%;">TL NO</td>
+                                                <td class="text-center" style="width:10%;">:</td>
+                                                <td style="width:60%;">{{meeting.0.meeting_id}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:30%;">Marking Date</td>
+                                                <td class="text-center" style="width:10%;">:</td>
+                                                <td style="width:60%;">{{meeting.0.marking_date}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:30%;">Time Limit Date</td>
+                                                <td class="text-center" style="width:10%;">:</td>
+                                                <td style="width:60%;">{{meeting.0.time_limit_date}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:30%;">TL Pending Days</td>
+                                                <td class="text-center" style="width:10%;">:</td>
+                                                <td style="width:60%;">{{pending_days}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card mt-2">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5>Other Information</h5>
+                                    {% if meeting.0.url %}
+                                        <a href="{{meeting.0.url}}" target="_blank">Document</a>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">{{meeting.0.description}}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                {% if meeting.has_other_pages %}
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination d-flex justify-content-between mt-3">
+                                            {% if meeting.has_previous %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ meeting.previous_page_number }}">Previous</a></li>
+                                            {% else %}
+                                            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                                            {% endif %}
+
+                                            {% if meeting.has_next %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ meeting.next_page_number }}">Next</a></li>
+                                            {% else %}
+                                            <li class="page-item disabled"><span class="page-link">Next</span></li>
+                                            {% endif %}
+                                        </ul>
+                                    </nav>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+  
+                    <!-- Modal -->
+                    <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content bg-warning">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">warning</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Have you filed meeting details in the template ?</p>
+                                <p>Are you sure ?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Let me fill.</button>
+                                <button type="button" onclick="import_meetings('{{adhikari.adhikari_id}}')" class="btn btn-primary">I'm Sure.</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+  
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="{% static 'scripts.js' %}"></script>
+        <script type="text/javascript">
+            CSRF_TOKEN = '{{csrf_token}}';
+
+            function import_meetings(adhikari_id)
+            {
+                $.ajax({
+                        headers:{ "X-CSRFToken": CSRF_TOKEN },
+                        url : '/import_meeting/', 
+                        type : 'POST', // http method
+                        data : {'adhikari_id':adhikari_id}, // data sent with the post request
+                        success : function(res) {
+                            if(res.status)
+                            {
+                                alert('Success');
+                            }
+                            location.reload();
+                        },
+                        // handle a non-successful response
+                        error : function(error) {
+                            alert(error);
+                            location.reload();
+                        }
+                    });
+            }
+            
+        </script>
+    </body>
+</html>
