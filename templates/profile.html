@@ -11,8 +11,15 @@
                 <!-- Page content-->
                 <div class="container-fluid">
                     <div class="row mt-2">
-                        <div class="col-md-12 d-flex justify-content-end">
-                            <button class="btn-sm btn-success m-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Meeting</button>
+                        <div class="col-md-12 d-flex justify-content-between">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                  <li class="breadcrumb-item"><a href="{% url 'index' %}">Dashboard</a></li>
+                                  <li class="breadcrumb-item"><a href="{% url 'adhikari_list' adhikari.0.type %}">Adhikari List ({{adhikari.0.type}})</a></li>
+                                  <li class="breadcrumb-item active" aria-current="page"> {{adhikari.0.adhikari_name}} (Meetings)</li>
+                                </ol>
+                            </nav>
+                            <button class="btn-sm btn-success m-2" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-plus"></i> Add Meeting</button>
                         </div>
                         <div class="col-md-3">
                             <div class="card">
@@ -27,7 +34,7 @@
                                 <div class="card-header d-flex justify-content-between">
                                     <h5 class="">General Information</h5>
                                     {% if meeting.0.meeting_id %}
-                                        <button class="btn btn-sm btn-danger" onclick="delete_meeting('{{meeting.0.meeting_id}}');">Delete</button>
+                                        <button class="btn btn-sm btn-danger" onclick="delete_meeting('{{meeting.0.meeting_id}}');"><i class="fas fa-trash"></i></button>
                                     {% endif %}
                                 </div>
                                 <div class="card-body">

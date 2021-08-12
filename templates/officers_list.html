@@ -11,8 +11,14 @@
                 <!-- Page content-->
                 <div class="container-fluid">
                     <div class="row mt-2">
-                        <div class="col-md-12 d-flex justify-content-end">
-                            <button class="btn-sm btn-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Adhikari</button>
+                        <div class="col-md-12 d-flex justify-content-between">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                  <li class="breadcrumb-item"><a href="{% url 'index' %}">Dashboard</a></li>
+                                  <li class="breadcrumb-item active" aria-current="page">Adhikari List ({{meeting_type}})</li>
+                                </ol>
+                            </nav>
+                            <button class="btn-sm btn-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-plus"></i> Add Adhikari</button>
                         </div>
                         <div class="col-md-12">
                             <table class="table table-success table-striped">
@@ -22,6 +28,7 @@
                                         <th scope="col">Name</th>
                                         <th scope="col">Designation</th>
                                         <th scope="col">Mobile</th>
+                                        <th scope="col">Total Meetings</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
@@ -32,8 +39,9 @@
                                         <td><a href="{% url 'meeting_list' adhikari.adhikari_id %}">{{adhikari.adhikari_name}}</a></td>
                                         <td>{{adhikari.designation}}</td>
                                         <td>{{adhikari.mobile}}</td>
+                                        <td>{{adhikari.meetingdetails_set.count}}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger" onclick="delete_adhikari('{{adhikari.adhikari_id}}');">Delete</button>
+                                            <button class="btn btn-sm btn-danger" onclick="delete_adhikari('{{adhikari.adhikari_id}}');"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     {% endfor %}
