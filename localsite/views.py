@@ -11,6 +11,8 @@ import xlrd
 from django import forms
 import os 
 import datetime
+from collectorate.settings import STATICFILES_DIRS
+from django.core.files.storage import FileSystemStorage
 
 @login_required(login_url='user_login') #redirect when user is not logged in
 def index(request):
@@ -179,3 +181,19 @@ def handle_uploaded_file(dir_path, f):
             destination.write(chunk)
     return True
 
+def update_adhikari(request):
+    AdhikariList.objects.filter(adhikari_id=request.POST['adhikari_id']).update(adhikari_name=request.POST['adhikari_name'], mobile=request.POST['adhikari_mobile'], designation=request.POST['adhikari_designation'])
+    return JsonResponse({'status':False, 'message':'Updated'})
+
+def update_meeting(request):
+    MeetingDetails.objects.filter(meeting_id=request.POST['meeting_id']).update(marking_date=request.POST['marking_date'], time_limit_date=request.POST['time_limit_date'], url=request.POST['document_url'], description=request.POST['description'])
+    return JsonResponse({'status':False, 'message':'Updated'})
+
+def change_profile_image(request):
+    if request.method == 'POST' and request.FILES['profile_image']:
+        myfile = request.FILES['profile_image']
+        fs = FileSystemStorage()
+        filename = fs.save(myfile.name, myfile)
+        uploaded_file_url = fs.url(filename)
+        AdhikariList.objects.filter(adhikari_id=request.POST['adhikari_id']).update(img_url=uploaded_file_url)
+    return JsonResponse({'status':False, 'message':'Updated'})

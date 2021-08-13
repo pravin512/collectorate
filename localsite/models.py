@@ -11,7 +11,7 @@ class AdhikariList(models.Model):
     type = models.CharField(db_column='FLD_TYPE', max_length=50, null=True)
     mobile = models.CharField(db_column='FLD_MOBILE', max_length=10, null=True)
     designation = models.CharField(db_column='FLD_DESIGNATION', max_length=50, validators=[MinLengthValidator(2)], null=True)
-    url = models.CharField(db_column='FLD_URL', max_length=256, validators=[MinLengthValidator(2)], null=True)
+    img_url = models.CharField(db_column='FLD_IMAGE_URL', max_length=256, validators=[MinLengthValidator(2)], null=True)
     created_by = models.ForeignKey(User, db_column='FLD_CREATED_BY', on_delete=models.CASCADE, null=True)
     added_date_time = models.DateTimeField(db_column='FLD_ADDED_DATE_TIME', auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True,db_column='FLD_UPDATED_DATE_TIME')

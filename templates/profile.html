@@ -2,6 +2,32 @@
 <html lang="en">
     {% load static %}
     {% include "commonCSS.html" %}
+    <style>
+        .file-input-wrapper {
+            height: 30px;
+            margin: 2px;
+            overflow: hidden;
+            position: relative;
+            width: 118px;
+            background-color: #fff;
+            cursor: pointer;
+            }
+
+            .file-input-wrapper>form>input[type="file"] {
+            font-size: 40px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            opacity: 0;
+            cursor: pointer;
+            }
+
+            #img_text {
+            float: right;
+            margin-right: -80px;
+            margin-top: -14px;
+            }
+    </style>
     <body>
         <div class="d-flex" id="wrapper">
             {% include "sidebar.html" %}
@@ -23,7 +49,19 @@
                         </div>
                         <div class="col-md-3">
                             <div class="card">
-                                <img src="{% static 'images/profile.jpg' %}" class="card-img-top" alt="...">
+                                {% if adhikari.0.img_url %}
+                                    <img src="{{adhikari.0.img_url }}" class="card-img-top image-circle" alt="Profile Picture" style="max-height:200px;">
+                                {% else %}
+                                    <img src="{% static 'images/profile.jpg' %}" class="card-img-top" alt="Profile Picture" style="max-height:200px;">
+                                {% endif %}
+                                <div class="file-input-wrapper text-center">
+                                    <form method="POST" id="profile_image_form" enctype="multipart/form-data" action="{% url 'change_profile_image' %}">
+                                        {% csrf_token %}
+                                        <a href="">Change</a>
+                                        <input type="file" accept="image/*" name="profile_image" id="profile_image" value="" />
+                                        <input type="hidden" name="adhikari_id" value="{{adhikari.0.adhikari_id}}">
+                                    </form>
+                                </div>
                                 <div class="card-body text-center">
                                   <h3 class="card-text">{{adhikari.0.adhikari_name}}</h3>
                                 </div>
@@ -34,7 +72,10 @@
                                 <div class="card-header d-flex justify-content-between">
                                     <h5 class="">General Information</h5>
                                     {% if meeting.0.meeting_id %}
-                                        <button class="btn btn-sm btn-danger" onclick="delete_meeting('{{meeting.0.meeting_id}}');"><i class="fas fa-trash"></i></button>
+                                        <div>
+                                            <button class="btn btn-sm btn-primary" title="Edit" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-danger" onclick="delete_meeting('{{meeting.0.meeting_id}}');"><i class="fas fa-trash"></i></button>
+                                        </div>
                                     {% endif %}
                                 </div>
                                 <div class="card-body">
@@ -119,13 +160,82 @@
                             </div>
                         </div>
                     </div>
-  
+
+                    <!-- edit Modal -->
+                    <div class="modal fade " id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Update</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="post" enctype="multipart/form-data" id="meetingUpdate">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="marking_date" class="form-label">Marking Date<sup class="text-danger">*</sup></label>
+                                            <input type="date" class="form-control" id="marking_date" name="marking_date" value="{{meeting.0.marking_date|date:'Y-m-d'}}">
+                                            <span class="marking_date_error text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="time_limit_date" class="form-label">Time Limit Date<sup class="text-danger">*</sup></label>
+                                            <input type="date" class="form-control" id="time_limit_date" name="time_limit_date" value="{{meeting.0.time_limit_date|date:'Y-m-d'}}">
+                                            <span class="time_limit_date_error text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="document_url" class="form-label">Document URL<sup class="text-danger">*</sup></label>
+                                            <input type="text" class="form-control" id="document_url" name="document_url" value="{{meeting.0.url}}">
+                                            <span class="document_url_error text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label">Description<sup class="text-danger">*</sup></label>
+                                            <textarea class="form-control" id="description" name="description">{{meeting.0.description}}</textarea>
+                                            <span class="description_error text-danger"></span>
+                                        </div>
+                                        <input type="hidden" name="meeting_id" id="meeting_id" value="{{meeting.0.meeting_id}}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" onclick="update_meeting();" class="btn btn-primary">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         {% include "commonJS.html" %}
         <script type="text/javascript">
             CSRF_TOKEN = '{{csrf_token}}';
+
+            $(document).ready(function(){
+                // select the file input (using a id would be faster)
+                $('#profile_image').change(function() { 
+                    // select the form and submit
+
+                    var data = new FormData($('#profile_image_form')[0]);
+                    $.ajax({
+                            headers:{ "X-CSRFToken": CSRF_TOKEN },
+                            url : '/change_profile_image/', 
+                            type : 'POST', // http method
+                            data: data,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            success : function(res) {
+                                location.reload();
+                            },
+                            // handle a non-successful response
+                            error : function(error) {
+                                alert(error);
+                                location.reload();
+                            }
+                        });
+
+                    // $('#profile_image_form').submit(); 
+                });
+            });
 
             function import_meetings(adhikari_id)
             {
@@ -178,6 +288,46 @@
                 else{
                     return false;
                 }
+            }
+
+            function update_meeting()
+            {
+                if($('#marking_date').val() == '')
+                {
+                    $('.marking_date_error').text('required');
+                    return false;
+                }
+                if($('#time_limit_date').val() == '')
+                {
+                    $('.time_limit_date_error').text('required');
+                    return false;
+                }
+                if($('#document_url').val() == '')
+                {
+                    $('.document_url_error').text('required');
+                    return false;
+                }
+                if($('#description').val() == '')
+                {
+                    $('.description_error').text('required');
+                    return false;
+                }
+
+                $.ajax({
+                        headers:{ "X-CSRFToken": CSRF_TOKEN },
+                        url : '/update_meeting/', 
+                        type : 'POST', // http method
+                        data: $('#meetingUpdate').serialize(),
+                        success : function(res) {
+                            alert(res.message);
+                            location.reload();
+                        },
+                        // handle a non-successful response
+                        error : function(error) {
+                            alert(error);
+                            location.reload();
+                        }
+                    });
             }
             
         </script>

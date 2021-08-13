@@ -41,7 +41,8 @@
                                         <td>{{adhikari.mobile}}</td>
                                         <td>{{adhikari.meetingdetails_set.count}}</td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger" onclick="delete_adhikari('{{adhikari.adhikari_id}}');"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm btn-primary" title="Edit" onclick="edit_adhikari('{{adhikari.adhikari_id}}', '{{adhikari.adhikari_name}}', '{{adhikari.designation}}', '{{adhikari.mobile}}');"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-danger" title="Delete" onclick="delete_adhikari('{{adhikari.adhikari_id}}');"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -49,7 +50,7 @@
                             </table>
                         </div>
                     </div>
-                    <!-- Modal -->
+                    <!-- upload Modal -->
                     <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -71,13 +72,48 @@
                             </div>
                         </div>
                     </div>
+                    <!-- edit Modal -->
+                    <div class="modal fade " id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Update</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="post" enctype="multipart/form-data" id="adhikariUpdate">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="adhikari_name" class="form-label">Name<sup class="text-danger">*</sup></label>
+                                            <input type="text" class="form-control" id="adhikari_name" name="adhikari_name" placeholder="Name" value="">
+                                            <span class="name_error text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="adhikari_designation" class="form-label">Designation<sup class="text-danger">*</sup></label>
+                                            <input type="text" class="form-control" id="adhikari_designation" name="adhikari_designation" placeholder="Designation" value="">
+                                            <span class="designation_error text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="adhikari_mobile" class="form-label">Mobile<sup class="text-danger">*</sup></label>
+                                            <input type="text" class="form-control" id="adhikari_mobile" name="adhikari_mobile" placeholder="Mobile" maxlength="10" value="">
+                                            <span class="mobile_error text-danger"></span>
+                                        </div>
+                                        <input type="hidden" name="adhikari_id" id="adhikari_id" value="">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" onclick="update_adhikari();" class="btn btn-primary">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         {% include "commonJS.html" %}
         
         <script type="text/javascript">
-            CSRF_TOKEN = '{{csrf_token}}';
 
             function import_adhikari()
             {
@@ -131,7 +167,51 @@
                     return false;
                 }
             }
+
+            function edit_adhikari(id, name, designation, mobile)
+            {
+                $('#adhikari_name').val(name);
+                $('#adhikari_designation').val(designation);
+                $('#adhikari_mobile').val(mobile);
+                $('#adhikari_id').val(id);
+
+                $('#editModal').modal('toggle');
+            }
             
+            function update_adhikari()
+            {
+                if($('#adhikari_name').val() == '')
+                {
+                    $('.name_error').text('required');
+                    return false;
+                }
+                if($('#adhikari_designation').val() == '')
+                {
+                    $('.designation_error').text('required');
+                    return false;
+                }
+                if($('#adhikari_mobile').val() == '')
+                {
+                    $('.mobile_error').text('required');
+                    return false;
+                }
+
+                $.ajax({
+                        headers:{ "X-CSRFToken": CSRF_TOKEN },
+                        url : '/update_adhikari/', 
+                        type : 'POST', // http method
+                        data: $('#adhikariUpdate').serialize(),
+                        success : function(res) {
+                            alert(res.message);
+                            location.reload();
+                        },
+                        // handle a non-successful response
+                        error : function(error) {
+                            alert(error);
+                            location.reload();
+                        }
+                    });
+            }
         </script>
     </body>
 </html>
